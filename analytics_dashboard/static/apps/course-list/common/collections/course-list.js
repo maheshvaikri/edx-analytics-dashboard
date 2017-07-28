@@ -9,10 +9,6 @@ define(function(require) {
         ListCollection = require('components/generic-list/common/collections/collection'),
         ProgramsCollection = require('course-list/common/collections/programs'),
         CourseModel = require('course-list/common/models/course'),
-        FieldFilter = require('course-list/common/filters/field-filter'),
-        ArrayFieldFilter = require('course-list/common/filters/array-field-filter'),
-        FilterSet = require('course-list/common/filters/filter-set'),
-        SearchFilter = require('course-list/common/filters/search-filter'),
 
         CourseListCollection;
 
@@ -109,32 +105,7 @@ define(function(require) {
             }, this);
 
             return filters[filterType];
-        },
-
-        // refresh: function() {
-        //     var filter = this.constructFilter();
-        //     ListCollection.prototype.refresh.call(this);
-        //     //this.fullCollection.reset(filter.filter(this.shadowCollection), {reindex: false});
-        //     this.trigger('backgrid:refresh', {collection: this});
-        // }
-        /*,
-
-        /*
-        // Override PageableCollection's setPage() method because it has a bug where it assumes that backgrid getPage()
-        // will always return a promise. It does not in client mode.
-        // Note: this function will only work in client mode. It should be removed if this collection is used
-        // in server mode.
-        setPage: function(page) {
-            var deferred = $.Deferred();
-
-            this.getPage(page - (1 - this.state.firstPage), {reset: true});
-            // getPage() will probably throw an exception if it fails in client mode, so assume succeeded
-            this.isStale = false;
-            this.trigger('page_changed');
-            deferred.resolve();
-            return deferred.promise();
         }
-        */
     });
 
     return CourseListCollection;

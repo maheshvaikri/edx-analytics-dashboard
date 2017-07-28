@@ -51,12 +51,12 @@ class CourseIndex(CourseAPIMixin, LoginRequiredMixin, TrackedViewMixin, LastUpda
         courses = None  # @@TODO remove
 
         enable_course_filters = switch_is_active('enable_course_filters')
-        summaries_data = (
-            CourseSummariesPresenter().get_course_summaries_response(**kwargs)
-        )
+        # summaries_data = (
+        #     CourseSummariesPresenter().get_course_summaries_response(**kwargs)
+        # )
         data = {
             'update_message': '',
-            'course_list_json': summaries_data['results'],
+            # 'course_list_json': summaries_data,
             'enable_course_filters': enable_course_filters,
             'enable_passing_users': switch_is_active('enable_course_passing'),
             'course_list_download_url': reverse('courses:index_csv'),
