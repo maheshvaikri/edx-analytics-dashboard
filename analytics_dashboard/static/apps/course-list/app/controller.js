@@ -8,6 +8,7 @@
  */
 import Backbone from 'backbone';
 import Marionette from 'marionette';
+import NProgress from 'nprogress';
 
 import CourseListView from 'course-list/list/views/course-list';
 
@@ -25,6 +26,8 @@ export default class CourseListController extends Marionette.Object {
      * been triggered. Executes before the route method does.
      */
   onShowPage() {
+    // clear loading bar
+    NProgress.done(true);
     // Clear any existing alert
     this.options.rootView.triggerMethod('clearError');
   }

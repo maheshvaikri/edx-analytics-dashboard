@@ -6,7 +6,6 @@ define(function(require) {
 
     var $ = require('jquery'),
         _ = require('underscore'),
-        Backbone = require('backbone'),
         ListCollection = require('components/generic-list/common/collections/collection'),
         ProgramsCollection = require('course-list/common/collections/programs'),
         CourseModel = require('course-list/common/models/course'),
@@ -15,11 +14,6 @@ define(function(require) {
         FilterSet = require('course-list/common/filters/filter-set'),
         SearchFilter = require('course-list/common/filters/search-filter'),
 
-        // this is a lightweight collection that will store the original models
-        // in order to restore to the full/original state after filtering is cleared
-        ShadowCourseListCollection = Backbone.Collection.extend({
-            model: CourseModel
-        }),
         CourseListCollection;
 
     CourseListCollection = ListCollection.extend({
@@ -28,28 +22,8 @@ define(function(require) {
 
         model: CourseModel,
 
-        /**
-         * The collection in its entirety.  Used to restore the collection clear
-         * clearing filters.
-         */
-        shadowCollection: undefined,
-
-        /**
-         * Matcher used when searching and created by the paginator's ClientSideFilter.
-         */
-        searchMatcher: undefined,
-
         initialize: function(models, options) {
             ListCollection.prototype.initialize.call(this, models, options);
-
-            // original collection are saved for filtering and restoring when filters are unset
-            /*this.shadowCollection = new ShadowCourseListCollection(models);
-            this.shadowCollection.listenTo(this, 'add', function(model, collection, ops) {
-                this.add(model, ops);
-            });
-            this.shadowCollection.listenTo(this, 'remove', function(model, collection, ops) {
-                this.remove(model, ops);
-            });*/
 
             this.programsCollection = options.programsCollection || new ProgramsCollection([]);
             // add program_ids to programs array on every course
@@ -98,56 +72,6 @@ define(function(require) {
         },
 
         /**
-         * Constructors a filter ANDed between search and filterable fields.
-         * The results are ORed Within the filterable fields,
-         */
-        constructFilter: function() {
-            var activeFilterFields = this.getActiveFilterFields(),
-                filters = [];
-            if (this.searchMatcher) {
-                filters.push(new SearchFilter(this.searchMatcher));
-            }
-
-            _(activeFilterFields).each(function(value, key) {
-                var activeFilters;
-                activeFilters = _(value.split(',')).map(function(field) {
-                    if ('fieldType' in this.filterableFields[key] &&
-                            this.filterableFields[key].fieldType === 'array') {
-                        return new ArrayFieldFilter(key, field);
-                    } else {
-                        return new FieldFilter(key, field);
-                    }
-                }, this);
-                filters.push(new FilterSet('OR', activeFilters));
-            }, this);
-
-            return new FilterSet('AND', filters);
-        },
-
-        updateSearch: function() {
-            if (this.pageableCollection) {
-                this.pageableCollection.getFirstPage({silent: true});
-            }
-            this.refresh();
-            this.trigger('backgrid:searchChanged', {
-                searchTerm: this.getSearchString(),
-                collection: this
-            });
-        },
-
-        unsetSearchString: function() {
-            ListCollection.prototype.unsetSearchString.call(this);
-            this.searchMatcher = undefined;
-            this.updateSearch(undefined);
-        },
-
-        setSearchString: function(searchString, matcher) {
-            ListCollection.prototype.setSearchString.call(this, searchString);
-            this.searchMatcher = matcher;
-            this.updateSearch();
-        },
-
-        /**
          * Given a filter type, returns the filters that can be applied and
          * display name.
          */
@@ -187,12 +111,13 @@ define(function(require) {
             return filters[filterType];
         },
 
-        refresh: function() {
-            var filter = this.constructFilter();
-            ListCollection.prototype.refresh.call(this);
-            //this.fullCollection.reset(filter.filter(this.shadowCollection), {reindex: false});
-            this.trigger('backgrid:refresh', {collection: this});
-        }/*,
+        // refresh: function() {
+        //     var filter = this.constructFilter();
+        //     ListCollection.prototype.refresh.call(this);
+        //     //this.fullCollection.reset(filter.filter(this.shadowCollection), {reindex: false});
+        //     this.trigger('backgrid:refresh', {collection: this});
+        // }
+        /*,
 
         /*
         // Override PageableCollection's setPage() method because it has a bug where it assumes that backgrid getPage()

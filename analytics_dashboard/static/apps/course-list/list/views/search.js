@@ -20,15 +20,16 @@ define(function(require) {
 
     require('backgrid-filter');
 
-    CourseListSearch = Backgrid.Extension.ClientSideFilter.extend({
+    CourseListSearch = Backgrid.Extension.ServerSideFilter.extend({
         className: function() {
-            return [Backgrid.Extension.ClientSideFilter.prototype.className, 'course-list-search'].join(' ');
+            return [Backgrid.Extension.ServerSideFilter.prototype.className, 'course-list-search'].join(' ');
         },
 
         events: function() {
-            var superEvents = Backgrid.Extension.ClientSideFilter.prototype.events;
-            delete superEvents['keydown input[type=search]']; // Don't search on key down
-            return _.extend(superEvents,
+            // TODO: delete this?
+            // var superEvents = Backgrid.Extension.ClientSideFilter.prototype.events;
+            // delete superEvents['keydown input[type=search]']; // Don't search on key down
+            return _.extend(Backgrid.Extension.ServerSideFilter.prototype.events,
                 {
                     'click .search': 'search',
                     'click .clear.btn': 'clear'
@@ -78,46 +79,35 @@ define(function(require) {
         },
 
         search: function(event) {
-            var searchString = this.searchBox().val().trim(),
-                matcher = _.bind(this.makeMatcher(this.query()), this);
-
-            if (event) {
-                event.preventDefault();
-            }
-
+            var searchString = this.searchBox().val().trim();
+            event.preventDefault();
             if (searchString === '') {
-                this.clear(event);
+                this.collection.unsetSearchString();
             } else {
-                this.options.collection.setSearchString(searchString, matcher);
-            }
-        },
-
-        clear: function(event) {
-            if (event) {
-                event.preventDefault();
-            }
-            this.options.collection.unsetSearchString();
-            this.clearSearchBox();
-        },
-
-        /**
-         * Called when the search changes and triggers a tracking event if something is
-         * searched for.
-         */
-        searchChanged: function(options) {
-            if (options.searchTerm) {
+                this.collection.setSearchString(searchString);
                 this.options.trackingModel.trigger('segment:track', 'edx.bi.course_list.searched', {
                     category: 'search'
                 });
             }
-            $('#course-list-focusable').focus();
+            this.execute();
         },
 
-        filtersCleared: function(filters) {
-            if (_(filters).has('text_search')) {
-                this.clear();
-            }
+        clear: function(event) {
+            event.preventDefault();
+            this.collection.unsetSearchString();
+            this.searchBox().val('');
+            this.execute();
+        },
+
+        execute: function() {
+            this.collection.refresh();
+            this.resetFocus();
+        },
+
+        resetFocus: function() {
+            $('#course-list-focusable').focus();
         }
+
     });
 
     return CourseListSearch;
