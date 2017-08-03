@@ -4,8 +4,7 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery'),
-        _ = require('underscore'),
+    var _ = require('underscore'),
         ListCollection = require('components/generic-list/common/collections/collection'),
         ProgramsCollection = require('course-list/common/collections/programs'),
         CourseModel = require('course-list/common/models/course'),

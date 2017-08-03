@@ -66,9 +66,9 @@ export default class CourseListController extends Marionette.Object {
         });
         this.options.rootView.showChildView('main', loadingView);
 
-        let fetch = collection.fetch({reset: true});
-        if(fetch) {
-          fetch.complete(function(response){
+        const fetch = collection.fetch({ reset: true });
+        if (fetch) {
+          fetch.complete((response) => {
             if (response && response.status === 404) {
               collection.reset();
             }

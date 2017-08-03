@@ -82,8 +82,8 @@ export default class CourseListApp extends Marionette.Application {
     }
 
     // Loading progress bar via nprogress
-    NProgress.configure({showSpinner: false});
-    $(document).ajaxStart(function() { NProgress.start(); });
-    $(document).ajaxStop(function() { NProgress.done(); });
+    NProgress.configure({ showSpinner: false });
+    $(document).ajaxStart(() => { NProgress.start(); });
+    $(document).ajaxStop(() => { NProgress.done(); });
   }
 }
