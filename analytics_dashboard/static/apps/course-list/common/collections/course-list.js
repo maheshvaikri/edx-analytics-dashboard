@@ -13,8 +13,6 @@ define(function(require) {
 
     CourseListCollection = ListCollection.extend({
 
-        mode: 'server',
-
         model: CourseModel,
 
         initialize: function(models, options) {
@@ -23,17 +21,7 @@ define(function(require) {
             this.programsCollection = options.programsCollection || new ProgramsCollection([]);
             // add program_ids to programs array on every course
             this.programsCollection.each(_.bind(function(program) {
-                var courseIds = program.get('course_ids');
-                _.each(courseIds, function(courseId) {
-                    var course = this.shadowCollection.get(courseId);
-                    if (course !== undefined) {
-                        course.set({
-                            program_ids: course.get('program_ids').concat(program.get('program_id'))
-                        });
-                    }
-                }, this);
-
-                // Also append this program's ID and display name to filterNameToDisplay
+                // append this program's ID and display name to filterNameToDisplay
                 // (so that the active filters will display the program title, not the ID)
                 if (this.filterNameToDisplay === undefined) {
                     this.filterNameToDisplay = {program_ids: {}};

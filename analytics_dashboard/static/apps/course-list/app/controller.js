@@ -20,6 +20,7 @@ export default class CourseListController extends Marionette.Object {
     super();
     this.options = options || {};
     this.listenTo(this.options.courseListCollection, 'sync', this.onCourseListCollectionUpdated);
+    this.listenTo(this.options.courseListCollection, 'error', this.showError);
     this.onCourseListCollectionUpdated(this.options.courseListCollection);
   }
 
@@ -134,4 +135,13 @@ export default class CourseListController extends Marionette.Object {
     });
     this.options.trackingModel.trigger('segment:page');
   }
+
+  showError() {
+    this.options.rootView.showAlert(
+      'error',
+      gettext('Server error'),
+      gettext('Your request could not be processed. Reload the page to try again.')
+    );
+  }
+
 }

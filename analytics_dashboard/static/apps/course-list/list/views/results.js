@@ -22,11 +22,9 @@ define(function(require) {
             this.options = options || {};
             this.listenTo(this.options.collection, 'sync', this.onCourseListCollectionUpdated);
         },
-
-        // TODO: I think we can remove this
-        // onBeforeShow: function() {
-        //     this.onCourseListCollectionUpdated(this.options.collection);
-        // },
+        onBeforeShow: function() {
+            this.onCourseListCollectionUpdated(this.options.collection);
+        },
         onCourseListCollectionUpdated: function(collection) {
             if (collection.getResultCount() > 0) {
                 // Don't re-render the courses table view if one already exists.
